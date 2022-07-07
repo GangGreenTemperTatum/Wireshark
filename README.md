@@ -1,12 +1,9 @@
 ### Ads Dawson - July 2022
+### WireShark Profiles
 
-<u>WireShark-Profiles</u>
-<p>
-Wireshark Profiles - Containing DFilters, CFilters (BPF Syntax), Coloring Rules, Preferences, IOGraphs
-       
-When you create a new Profile, Wireshark makes a copy of the Global Configurations to the destination profile and folder
-       
-Wireshark Personal Preferences override Global Preferences
+* Wireshark Profiles - Containing DFilters, CFilters (BPF Syntax), Coloring Rules, Preferences, IOGraphs
+* When you create a new Profile, Wireshark makes a copy of the Global Configurations to the destination profile and folder
+* Wireshark Personal Preferences override Global Preferences
 
 Example of profile folder contents:
 ```
@@ -28,13 +25,13 @@ drwxr-xr-x@ 13 ads staff 416B 16 Jun 09:14 .
 ```
 </p>
 
-### Wireshark Capture Filters Use BPF (Berkley Packet Filter) Syntax, same as TCPDump
-### Wireshark Display Filters use Wireshark custom syntax / Wireshark's specialized display filter format
-### A BPF virtual machine lives inside the kernel
+* Wireshark Capture Filters Use BPF (Berkley Packet Filter) Syntax, same as TCPDump
+* Wireshark Display Filters use Wireshark custom syntax / Wireshark's specialized display filter format
+* A BPF (Berkley Packet Filter) virtual machine lives inside the kernel of the computer
 
 ## Comparison Operators
-Symbol Expression | Text Expression | Definition
 ```
+Symbol Expression | Text Expression | Definition
 * == | eq | 'EQUAL TO'
 * || | or | 'OR'
 * && | and | 'AND'
