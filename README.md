@@ -1,12 +1,12 @@
 ### Ads Dawson - July 2022
 
-<u># WireShark-Profiles</u>
+<u>WireShark-Profiles</u>
 <p>
 Wireshark Profiles - Containing DFilters, CFilters (BPF Syntax), Coloring Rules, Preferences, IOGraphs
 When you create a new Profile, Wireshark makes a copy of the Global Configurations to the destination profile and folder
 Wireshark Personal Preferences override Global Preferences
 
-##**Example of profile folder contents:**
+**Example of profile folder contents:
 ```
 ads@-XXXX WireShark Profiles % cd "Better Default + Packet Diagram" 
 ads@-XXXX Better Default + Packet Diagram % ls -halt 
@@ -26,10 +26,12 @@ drwxr-xr-x@ 13 ads staff 416B 16 Jun 09:14 .
 ```
 </p>
 ### Wireshark Capture Filters Use BPF (Berkley Packet Filter) Syntax, same as TCPDump
+
 ### Wireshark Display Filters use Wireshark custom syntax / Wireshark's specialized display filter format
+
 ### A BPF virtual machine lives inside the kernel
+
 ## Comparison Operators
-<p>
 Symbol Expression | Text Expression | Definition
 ```
 * == | eq | 'EQUAL TO'
@@ -44,7 +46,6 @@ Symbol Expression | Text Expression | Definition
 * NA | contains | 'CONTAINS'
 * NA | matches | 'MATCHES'
 ```
-</p>
 # Matches Comparison Operator
 <p>
 The Matches Operator (within a Display Filter) is used with Perl regular expressions (REGEX) to search for a string within a field which the functionality is provided through libpcre (Perl Compatible Regular Expressions Library - regexlib.com/cheatsheet.aspx), I.E:
