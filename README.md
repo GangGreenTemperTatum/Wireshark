@@ -3,10 +3,12 @@
 <u>WireShark-Profiles</u>
 <p>
 Wireshark Profiles - Containing DFilters, CFilters (BPF Syntax), Coloring Rules, Preferences, IOGraphs
+       
 When you create a new Profile, Wireshark makes a copy of the Global Configurations to the destination profile and folder
+       
 Wireshark Personal Preferences override Global Preferences
 
-**Example of profile folder contents:
+Example of profile folder contents:
 ```
 ads@-XXXX WireShark Profiles % cd "Better Default + Packet Diagram" 
 ads@-XXXX Better Default + Packet Diagram % ls -halt 
