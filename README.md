@@ -27,10 +27,9 @@ drwxr-xr-x@ 13 ads staff 416B 16 Jun 09:14 .
 -rw-rw-r--@ 1 ads staff 783B 11 Mar 2021 io_graphs
 ```
 </p>
+
 ### Wireshark Capture Filters Use BPF (Berkley Packet Filter) Syntax, same as TCPDump
-
 ### Wireshark Display Filters use Wireshark custom syntax / Wireshark's specialized display filter format
-
 ### A BPF virtual machine lives inside the kernel
 
 ## Comparison Operators
