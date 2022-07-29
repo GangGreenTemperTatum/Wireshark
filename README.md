@@ -1,4 +1,4 @@
-### Ads Dawson _Scratchpad July 2022_ & [WCNA](https://www.wcnacertification.com/) Study Notes
+### Ads _Scratchpad July 2022_ & [WCNA](https://www.wcnacertification.com/) Study Notes
 
 * Kudos to [Dillinger](https://dillinger.io/) for the Markdown tips!
 * I hope this README is useful to anyone on their WCNA journey! This is a quick 'crib' sheet of my notes whilst studying
