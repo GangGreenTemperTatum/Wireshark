@@ -1,7 +1,14 @@
 ### Ads Dawson _Scratchpad July 2022_ & [WCNA](https://www.wcnacertification.com/) Study Notes
-Kudos to [Dillinger](https://dillinger.io/) for the Markdown tips!
-* Whilst MAC OS ships with 'tcpdump' application, it does not package or default install tshark.
-* If you install tshark by downloading and extracting the .dmg, it does not include tshark.
+
+* Kudos to [Dillinger](https://dillinger.io/) for the Markdown tips!
+* I hope this README is useful to anyone on their WCNA journey! This is a quick 'crib' sheet of my notes whilst studying
+* The best method of studying, is load up Wireshark and get to work capturing those packets!
+* Or, use the incredible plethora of PCAPNG files available across the community and repo's for in-depth packet analysis
+
+### Wireshark `Installation` Information and Miscellaneous:
+
+* Whilst **MAC OS** ships with the 'tcpdump' application, it does not package or default install tshark.
+* If you install Wireshark by downloading and extracting the .dmg, it does not include tshark.
 * To resolve this, use brew installer: 
 
 ```
@@ -11,15 +18,36 @@ Kudos to [Dillinger](https://dillinger.io/) for the Markdown tips!
 > Note, after doing so you will need to install chmodBPF to allow capturing on local interfaces
 * Of course, MAC OS driver used to capture packets is libpcap.
 
+* NPCAP is not supported on ["ARM64 Processors"](https://docs.microsoft.com/en-us/windows/arm/overview) for **Microsoft Windows OS** and is a known [Issue](https://github.com/nmap/npcap/issues/585)
+* This is reported [here](https://www.reddit.com/r/wireshark/comments/w9yauv/wireshark_was_working_fine_then_i_had_to_nuke_my/) and [here](https://ask.wireshark.org/question/26706/npcap-is-installed-but-wireshark-says-unable-to-load-on-arm64/) by the Wireshark Community
+
+* `ctrl+E` (key commands) = keyboard shortcut to start/stop capturing in Wireshark
+* Wireshark can capture only the packets that the packet capture library - libpcap on UNIX-flavored OSes, and the Npcap port to Windows of libpcap on Windows - can capture, and libpcap/Npcap can capture only the packets that the OS’s raw packet capture mechanism (or the Npcap driver, and the underlying OS networking code and network interface drivers, on Windows) will allow it to capture.
+* Unless the OS always supplies packets with errors such as invalid CRCs to the raw packet capture mechanism, or can be configured to do so, invalid CRCs to the raw packet capture mechanism, Wireshark - and other programs that capture raw packets, such as tcpdump - cannot capture those packets
+* Within Wireshark, to export as CSV.. **File > Export Packet Dissections > a "CSV"**. WireShark can import CSV (comma separated value) format files * for further analysis.
+* Automatic packet capture to one or more files feature is available in Wireshark
+* Capturing packets within Wireshark is recommended between two routers.
+* A purpose of installing a TAP in the network is to **provide a copy of the network traffic without compromising network integrity**
+* Wireshark can also decode Netflow packets
+* Database record transfers including Microsoft Sharepoint can be a nightmare for packet capture analysis and displays a single connection for each record but with multiple small packet sizes
+
 ### `WireShark-Profiles`
 
-* `Wireshark Profiles` - Containing DFilters, CFilters (BPF Syntax), Coloring Rules, Preferences (including font size and style, layout, Protocol preferences E.G {{TCP Relative SEQ Numbers}}), IOGraphs
+* `Wireshark Profiles` - Containing:
+> * DFilters (Display Filters - Wireshark custom syntax) - Applied during the capture process or when opening a capture file
+> * Display Filter Macros (there are no 'cfilter' macros)
+> * CFilters (BPF, Berkley Packet Filter Syntax from 'libpcap' driver and used by Tshark, tcpdump) - Applied prior to the capture
+> * Coloring Rules (written in Wireshark Display Filter 'dfilter' custom syntax)
+> * Preferences (including font size and style, layout and Protocol preferences E.G {{TCP Relative SEQ Numbers}})
+> * IOGraphs
+
 * When you create a new Profile, Wireshark makes a copy of the Global Configurations to the destination profile and folder
 * Wireshark Personal Preferences override Global Preferences
 * `Display Filter Macros` are saved in `{dfilters_macros}` in your Personal Configuration Folder and if created under a profile other than the default, the `{dfilters_macros}` is saved in the Profile's directory. 
 * Wireshark does not contain Capture Filter macros and is only for Display Filters
 * Display Filters (default file = `dfilters`) can be created based on the contents of fields that do not actually exist in the packet such as "Time Since Referenced" or "First Packet Field", which is not the same for cfilters
 * dfilters (Display Filters, using Wireshark custom syntax) can be applied during the capture process
+* Filter Expression buttons (create a Display Filter via the Disply Filter bar) are **NOT** saved in the dfilters file
 
 * The syntax used for this file is:
 
@@ -52,34 +80,38 @@ drwxr-xr-x@ 13 ads staff 416B 16 Jun 09:14 .
 * Capture filters use Berkley Packet Filtering (BPF) format and Wireshark includes a default set of capture filters.
 * Capture filters default capture filter filename is `cfilters`
 
-* `ctrl+E` (key commands) = keyboard shortcut to start/stop capturing in Wireshark
-* Wireshark can capture only the packets that the packet capture library - libpcap on UNIX-flavored OSes, and the Npcap port to Windows of libpcap on Windows - can capture, and libpcap/Npcap can capture only the packets that the OS’s raw packet capture mechanism (or the Npcap driver, and the underlying OS networking code and network interface drivers, on Windows) will allow it to capture.
-* Unless the OS always supplies packets with errors such as invalid CRCs to the raw packet capture mechanism, or can be configured to do so, invalid CRCs to the raw packet capture mechanism, Wireshark - and other programs that capture raw packets, such as tcpdump - cannot capture those packets
-* Within Wireshark, to export as CSV.. **File > Export Packet Dissections > a "CSV"**. WireShark can import CSV (comma separated value) format files * for further analysis.
-* Automatic packet capture to one or more files feature is available in Wireshark
-* Capturing packets within Wireshark is recommended between two routers.
-* A purpose of installing a TAP in the network is to **provide a copy of the network traffic without compromising network integrity**
-* Wireshark can also decode Netflow packets
-* Database record transfers including Microsoft Sharepoint can be a nightmare for packet capture analysis and displays a single connection for each record but with multiple small packet sizes
+* Cfilters support the `portrange` command:
+```
+$ tcp portrange 20-25
+```
 
-* Tshark uses Berkeley Packet Filter syntax "**-f**" “<filter>”, which is also used by tcpdump. - I.E the Capture Filter syntax with "**-f**" parameters.. Using display filters with Tshark during a live capture does not limit the packets you are capturing, but the packets visible once applying the filter. Using these display filters with Tshark on previously saved captures allows you to create a subset of the original trace file.
-* Tshark can be used with display filters using the "**-R**" parameter ... Other useful parameters are "**-r**" for read a PCAP and **-w** parameters for write to a PCAP file.. "**-h**" to list the Tshark parameters and "**-t**" to specify time format
+* Tshark uses Berkeley Packet Filter syntax (Capture Filters) "**-f**" “<filter>”, which is also used by tcpdump.
+    * I.E the Capture Filter syntax with "**-f**" parameters.. 
+* Using display filters with Tshark during a live capture does not limit the packets you are capturing, but the packets visible once applying the filter. 
+* Using these display filters with Tshark on previously saved captures allows you to create a subset of the original trace file.
+* Tshark can be used with display filters using the "**-Y**" parameter
+    * "**-Y**" Parameter is used as the old "**-R**" Parameter for Tshark Display filters is deprecated
+* Other useful parameters are 
+    * "**-r**" for read a PCAP and **-w** parameters for write to a PCAP file..
+    * "**-h**" to list the Tshark parameters
+    * "**-t**" to specify time format
 
 ```
 ads@<hostname> ~ % tshark -n -w Downloads/sid.pcap -Y 'string(ip.src) contains "^192\\.168\\.(1)\\.[0-255]"'
 tshark: Display filters aren't supported when capturing and saving the captured packets.
 ```
 
-* "**-Y**" Parameter is used as the old "**-R**" Parameter for Tshark Display filters is deprecated
+
 * This is known as [Bug 2234](https://wiki.wireshark.org/ReportingBugs) where Display Filters do not work if you are:
 1) Running a live capture
 2) Saving packets to a file
 * A workaround is to capture without a display filter, run Tshark against that new file with the Display Filter set and then write to a new file
+
 * There are three primary operators available for Capture Filters:
 
-> Negation (not or !) - When using this operator, each packet must match only one side of the operator to pass through the filter
-> Concatentation (and or &)
-> Alternation (or or |)
+> * Negation (not or !) - When using this operator, each packet must match only one side of the operator to pass through the filter.
+> * Concatentation (and or &) - When using this operator, both packets must match one the side of the operator to pass through the filter.
+> * Alternation (or or |) - When using this operator, each packet must match only one side of the operator to pass through the filter.
 
 * Here is an example of the [Tshark](https://www.wireshark.org/docs/man-pages/tshark.html) Help Syntax:
 
@@ -231,44 +263,42 @@ Miscellaneous:
                            use "-G help" for more help
 ```
 
-### `Wireshark Display Filters` use Wireshark custom **propietary** syntax, AKA Wireshark's specialized display filter format
+### `Wireshark Display Filters` use Wireshark custom **propietary** syntax
+
+* AKA Wireshark's specialized display filter format
 * A BPF (Berkley Packet Filter) virtual machine lives inside the kernel
 
-### `Capinfos.exe` prints information about trace files:
-
-```
-$ capinfos [options] <infile> ..
-```
-
 ### `Comparison Operators` for Display Filters (Wireshark custom **propietary** syntax, AKA Wireshark's specialized display filter format) 
+
 * Using Operators, you can create display filters based on the contents of a field.
 
 | Symbol Expression | Text Expression & Definition |
 | ------ | ------ |
 | `==` | eq 'EQUAL TO' |
-| `||`| or 'OR AKA Alternation' |
-| `^^`| xor 'XOR' (Only one of multiple conditions must match) | 
-| `&&`| and 'AND' |
-| `gt`| 'GREATER THAN' |
+| `||` | or 'OR AKA Alternation' |
+| `^^` | xor 'XOR' (Only one of multiple conditions must match) | 
+| `&&` | and 'AND' |
+| `>` | gt 'GREATER THAN' |
 | `<` | lt 'LESS THAN' |
-| `=` | ge 'GREATER THAN OR EQUAL TO' |
+| `>=` | ge 'GREATER THAN OR EQUAL TO' |
 | `<=` | le 'LESS THAN OR EQUAL TO' |
 | `!` | not/negate 'NOT' |
-| `!=` | ne | 'NOT EQUAL TO' |
+| `!=` | ne 'NOT EQUAL TO' |
 | `NA` | contains 'CONTAINS' |
 | `NA` | matches 'MATCHES' |
 | `""` | Text/String Search 'String/Text Search - Substring Operator' |
 
 ### `Matches` Comparison Operator and `Regex`
 
-The Matches Operator (within a Display Filter) is used with Perl regular expressions (REGEX) to search for a string within a field which the functionality is provided through libpcre [Perl Compatible Regular Expressions Library](regexlib.com/cheatsheet.aspx), I.E: _(Display filter)_
+The Matches Operator (within a Display Filter) is used with Perl regular expressions (REGEX) to search for a string within a field which the functionality is provided through `libpcre` [Perl Compatible Regular Expressions Library](regexlib.com/cheatsheet.aspx), I.E: _(Display filter)_
 
 ```
 http.request.method=="GET" && (http matches "\.(?i) (zip|exe)}` 
 ```
 
-> If we are interested in all HTTP requests for files ending in .zip or .exe (Capture filter)
-OR:
+> If we are interested in all HTTP requests for files ending in .zip or .exe, case in-sensitive (Capture filter)
+> 
+> OR:
 
 ```
 $ http matches "\.(?i) (zip|exe|jar)" .. 
@@ -353,38 +383,56 @@ adamdawson@SL-XXXX ~ % tshark -r ~/Downloads/ads-tcp-http_curl-three-way-handsha
 adamdawson@SL-XXXX ~ %
 ```
 
-
-
 ### `{Tshark -qz Operator:}`
+
 * Tshark can be used to quickly gather statistics on live traffic or trace files and filters can be applied to the packets to limit the statistics to specific packet types, not packets for capture (**-f**) and therefore Display (-Y)
 * `{-q}` option if you only want the statistics and not want to see the packets while running Tshark
+
 > Example of displaying PHS (Protocol Hierarchy Statistics) of traffic seen by Wireshark only, but not displayed on the screen
+
 ```
 $ tshark -qz io,phs
 ```
+
 * Most of the `{-q}` option's can be used multiple times in one command-line string
 > Example of combine request for Ethernet, IP and TCP Conversation Statistics
+
 ```
 $ tshark -qz conv,eth -z conv,ip -z conv,tcp
 ```
+
 > Example of displaying IO statistics for IP, UDP and TCP traffic at 10 second intervals
+
 ```
 $ tshark -qz io,stat,10,ip,udp,tcp
 $ tshark -z io,stat,5,icmp -w allpakts.pcapng
+
 ```
 > Example of omitting Tshark gathered information to stdout from capturing hosts on interface 1
+
 ```
-$ tshark -i 1 -qz hosts -z conv,ip # Will display the IP conversation statistics and hosts information
+$ tshark -i 1 -qz hosts -z conv,ip 
+# Will display the IP conversation statistics and hosts information
 $ tshark -i 1 -qz hosts > hostsinfo.txt
 ```
 
 ### `Wireshark Best Practices` for Packet Heads:
+
 * Remember to setup default packet capture type as **PCAPNG** (Next-Generation) Format which are backwards compatible and also store them as trace files which includes packet comments. 
     * We recommend saving your trace files in .pcapng format to support packet and trace file annotations
 * Remember to setup default Packet Capture Location Folder for ease of saving traces 
 * [MaxMind Geo-IP DB's](https://www.maxmind.com/en/home) are stored in **'/Users/ads/.config/wireshark'** personal configuration files
 * Expert Info Button is in Wireshark's Status Bar and **_"Analyze" > Expert Info_**
-* Use the *_"Analyze" > Expert Info Summary_* to view all Packet Comments, or recommended to add as **_"pk_comments"_** a column to view Packet comments inline with the entire capture 
+* Use the **_"Analyze" > Expert Info Summary_** to view all Packet Comments, or recommended to add as **_"pk_comments"_** a column to view Packet comments inline with the entire capture 
+    * Upon further investigation, the latest version of Wireshark seems to have the new updated field:
+
+```
+$ frame.comment == "ads-test"
+```
+
+    * To add a packet comment, right-click on a frame and select **"Packet Comments >> Add New Comment"**
+    * Once done, the comment will appear in a subtree above the Frame subtree within the Packet Bytes section
+    * To display all packet comments within the file ... **"Menu > Statistics >> Capture File Properties"**, or click on the pcap icon in the bottom status bar, to the left of the profile in-use
 * Use the following Display Filter to filter on all TCP Expert notifications as a Display Filter:
 
 ```
@@ -397,32 +445,36 @@ $ tcp.analysis.flags
 * `Coloring Rules` are processed in Top->Down fashion/order and are created using Display Filter (BPF) Syntax
 * Sync your Wireshark machine with an NTP source for accurate timestamps
 * Beware of sharing Preferences Files within Wireshark profiles which may be specific to the original Wireshark system such as default directory setting for opening new trace files and default capture device setting
-* Beware of also exposing internal company IP addresses and recommended to sanitize trace files by using a hexadecimal editor and performing a search and replace function for all IP addresses in the trace file
-* Bit-Twiste - bittwist.sourceforge.net can be used to automatically change the IP addresses and calculate the new checksum values if you wish to recalculate the checksum values after changing IP's
-* `Bit-Twist` is a simple yet powerful libpcap-based Ethernet packet generator. It is designed to complement tcpdump, which by itself has done a great job at capturing network traffic.
+* Beware of also exposing internal company IP addresses and recommended to sanitize trace files by using a hexadecimal editor and performing a search and replace function for all IP addresses in the trace file, such as:
+
+> * Bit-Twiste - bittwist.sourceforge.net can be used to automatically change the IP addresses and calculate the new checksum values if you wish to recalculate the checksum values after changing IP's
+> * `Bit-Twist` is a simple yet powerful libpcap-based Ethernet packet generator. It is designed to complement tcpdump, which by itself has done a great job at capturing network traffic.
+
 ```
 $ bittwiste -I ftp-ioupload-partial.pcap -O ftpmod.pcap -T ip -s 67.161.19.78,10.10.19.78 -d 67.161.19.78,10.10.19.78
 ```
+
 * If you want to save the TCP header as a text file, expand the TCP header in a packet and choose **_File | Export Packet Dissections | Choose as | Plain Text File_**
 
 ### `Baselining`, `Troubleshooting` and Network `Forensics`:
 
-* `Baselining` is the process of creating a set of trace files that depict "nomal" communications on the network. 
+* `Baselining` is the process of creating a set of trace files that depict "normal" communications on the network. 
     * Having baselines that we created before network problems or security breaches occur can speed up the investigation and remediation process. 
     * Ultimately, baselines enable you to resolve problems more effectively & efficient
     * Anything outside of a baseline pattern of traffic is usually tagged as anamolous, or an anomaly. 
-    * Baselining idle traffic establishes an understanding of "background traffic" for BAU that typically occurs.
+    * Baselining `idle traffic` establishes an understanding of "background traffic" for BAU that typically occurs (backups, anti-virus, patching etc.)
 
 * Baselining can be beyond just trace files and include additional information such as images, screenshots, summary data, IO graph information and network maps.
-    * For baselining, it is recommended to apply columns such as 
+* For baselining, it is recommended to apply columns such as 
     * **RTT (round trip time - especially for initial TCP handshakes)** 
-    * Looking at **_"Analyze" > Expert Info flags**_ _($`tcp.analysis.flags`)_
+    * Looking at **"Analyze" > Expert Info flags** .. Or Display Filter, ($`tcp.analysis.flags`)
     * **Capture File Information**
     * **PHS (Protocol Hierarchy Statistics)**
     * **_Statistics > Packet Lengths Graph & Small Payload Sizes_**
     * **TCP Window Size Column** values 
     * **_"Statistics" > Packet/Protocol Summaries & Statistics._**
-* When it comes to baselining, you may also need to tap into network traffic not destined to and from the capturing local machine (such as Monitor mode on Wireless). Also consider using an application such as iPerf to perform throughput tests and capture the file during the test to graph the IO Rate as well as analyze packet sizes.
+* When it comes to baselining, you may also need to tap into network traffic not destined to and from the capturing local machine (such as Monitor mode on Wireless). 
+* Also consider using an application such as iPerf to perform throughput tests and capture the file during the test to graph the IO Rate as well as analyze packet sizes.
 
 * To identify delays such as `Latency` in a trace file, set the **'Time Column'** to **'Seconds Since Previous Displayed Packet'**, filter on a conversation.
     * Then sort the column to note the large gaps in time between packets in the trace file.
@@ -435,7 +487,8 @@ $ tcp.time_delta > 1
 $ tcp.time_delta > 1 && tcp.flags.fin==0 && tcp.flags.reset==0
 ```
 * The second part of the second filter identifies an explicit (**tcp.rst**) or implicit connection shutdown process.
-* In a UDP-based application, the retransmission timeout value is dictated by the application itself. Whereas, TCP will automatically attempt to recover from the problem.
+* In a UDP-based application, the retransmission timeout value is dictated by the application itself. 
+    * Whereas, TCP (by-nature) will automatically attempt to recover from the problem.
 
 * `Packet Marking` is also recommended during troubleshooting for **_((Edit > Find Next Mark | Find Previous Mark))_**
 * Being `"Upstream"` defines that you are closer to the sender of the data in the traffic flow.
@@ -446,7 +499,8 @@ $ tcp.time_delta > 1 && tcp.flags.fin==0 && tcp.flags.reset==0
 * VLANs separate broadcast domains
 * Ports separate collision domains **(CSMA/CD)**
 
-* If `Expert Info` detects **"NOP"** (_No Option / Operator_ - I.E disabling SACK - Selective ACK's) means an inline router may have removed some TCP options. Move the analyze to the other side of the routing device and compare the TCP options in the handshake.
+* If `Expert Info` detects **"NOP"** (_No Option / Operator_ - I.E disabling SACK - Selective ACK's) means an inline router may have removed some TCP options. 
+    * Move the analyze to the other side of the routing device and compare the TCP options in the handshake.
 * One way to capture with Wireshark under-the-radar and avoid detection is to disable the TCP/IP stack and disable network name resolution, but Wireshark will continue to capture traffic [Sec Tools](https://sectools.org) and [WireShark Wiki Tools](https://wiki.wireshark.org/tools)
 * `Network Forensics` is the process of examining network traffic for evidence of unusual or unacceptable traffic which may include:
     * Reconnaissance (discovery) processes
@@ -494,37 +548,50 @@ $ ipv6.src_6to4_sla_id
 # [`Wireshark Libraries` and Traffic Capture Process](https://www.wireshark.org/docs/wsdg_html_chunked/ChapterLibraries.html#:~:text=Like%20most%20applications%2C%20Wireshark%20depends,import%20libraries%2C%20and%20related%20resources.)
 
 ### [`Libpcap`](www.tcpdump.org)
+
 * The libpcap library is the industry standard link-layer interface for capture traffic on *NIX hosts.
 * These hosts also support Monitor Mode 
+
 ### [`WinPCAP`](www.winpcap.org)
-* WinPCAP is the Windows port of the libpcap link-layer interface. WinPcap consists of a driver that provides low-level network access and the Windows version of the libpcap API.
-WinPap does not support Monitor Mode and therefore does not work with Wireshark or Tshark in Windows 
+
+* WinPCAP is the Windows port of the libpcap link-layer interface. 
+* WinPcap consists of a driver that provides low-level network access and the Windows version of the libpcap API.
+* WinPcap does not support Monitor Mode and therefore does not work with Wireshark or Tshark in Windows to tap traffic on other SSID's
+
 ### [`AirPcap`](www.riverbed.com/us/products/cascase/aipcap.php)
+
 * AirPCAP is a link-layer interface and network adapter to capture 802.11 traffic on Windows operating systems. 
 AirPcap adapaters operate in passive mode to capture WLAN data, management and control frames.
 
 ## `Wireless Traffic Monitoring`
 
+* `SSID` == The "Name: of a wireless network (WLAN). The SSID keeps the packets within the correct WLAN, even when overlapping WLANs are present.
+* `BSSID` == The Basic Service Set is the AP's radio' MAC address. When there are multiple access points within each WLAN, a BSSID is a way to identify those access points and their associated clients.
+* `ESSID` == Extended Service Set consists of all the BSS's in the network and the ESSID identifies the same network as the SSID does.
+
 > * How can you quickly identify all WLAN BSSIDs seen in a trace file? == **"Open Statistics | WLAN Traffic"**
 
-> Wireshark cannot identify unmodulated RF energy of interference and requires a spectrum analyzer such as [MetaGeek](www.metageek.net/wiresharkbook)
-### `Promiscuous Mode `
+* Wireshark cannot identify unmodulated RF energy of interference and requires a spectrum analyzer such as [MetaGeek](www.metageek.net/wiresharkbook)
+
+### `Promiscuous Mode`
+
 * Sets interface to capture all packets on a network segment to which it is associated to
-    * In Promiscuous Mode, an 802.11 adapter only captures packets of the SSID the adapter has joined
+    * In Promiscuous Mode, an 802.11 adapter only captures packets of the SSID the adapter has joined, not limited to but including traffic not destined to the local hardware address (therefore including IPv4 broadcast, multicast etc.)
 1. **Promiscuous Mode** enables a network card and driver to capture traffic that is addressed to **other devices on the network and not just the local hardware address**
 2. In **Promiscuous Mode** only without Monitor Mode, an 802.11 adapter only captures packets of the SSID the adapter has joined
-3. Although at the radio level it can receive packets on other SSID's, those packets are not forwarded to the host
+    * Although at the radio level it can receive packets on other SSID's, those packets are not forwarded to the host
 
 ### `Monitor Mode` .. AKA "`rfmon mode`"
 
-* In Monitor Mode, an adapter does not associate with any SSID and all packets from all SSID's on the selected channel are captured
+* In Monitor Mode, an adapter does not associate with any SSID and all packets from all SSID's on the selected channel are captured (again, not limited to but including traffic not destined to the local hardware address (therefore including IPv4 broadcast, multicast etc.)
     * In order to capture all traffic that the adapter can receive, the adapter must be put into Monitor Mode. 
-    * When using Monitor Mode, the driver does not make the adapter a member of any service set on the network meaning that the adapter will not support general network communications such as web browsing, since it is busy monitoring and sniffing all RF-Energy on the selected channel. 
-    * **Monitor Mode is not supported by WinPCAP.**
-In `Monitor Mode`, **all packets of all SSIDs** from the currently **SELECTED CHANNEL** are captured.
+    * When using Monitor Mode, the driver does not make the adapter a member of any service set on the network meaning that the adapter will not support general network communications such as web browsing (since it is busy monitoring and sniffing all RF-Energy on the selected channel)
+    * **Monitor Mode is not supported by WinPCAP.** (Windows Operating System and native hardware adapters, the solution is `airpcap` which can sniff in Monitor Mode on a selected radio channel, or use an aggregator and multiple airpcap's to sniff multiple radio channels)
+    * In `Monitor Mode`, **all packets of all SSIDs** from the currently **SELECTED CHANNEL** are captured.
+
 > Setup the wirless interface to capture all traffic it can receive (Unix/ Linux only)
 1. In order to capture all-SSID traffic that the adapter at the radio level can receive, the adapter must be put into **"Monitor Mode"**
-2. AKA **"rfmon mode"**
+2. AKA `"rfmon mode"`
 3. In this mode, the driver does not make the adapter a member of any service set (meaning that the adapter will not support general network communications such as web browsing, since it is busy monitoring and sniffing all RF-Energy on the selected channel)
 4. In monitor mode, the adapter won't support general network communications. It only supplies received packets to a packet capture mechanism such as Wireshark, not to the network stack.
 5. Test to see if your network interface cards/drivers support Monitor Mode 
@@ -558,59 +625,77 @@ $ wlan host <wlan_mac>
 $ wlan
 ```
 
-### `Wireshark Wiretap Library`
-* The Wireshark Wiretap Libraby processes opened traced files for visibility and analysis within the UI for a selected amount of file types.
-
 # `Wireshark Processes Packets and Wireshark Architecture`
+
 ### Wireshark Architecture Flow Diagram:
 
 ```
 *---------------------------------------*
 *---------------------------------------*
-Capture Engine | Wiretap Library
-       ↓       |        ↓
+    Capture Engine | Wiretap Library
+           ↓       |        ↓
 *---------------------------------------*
-          Core Engine
+              Core Engine
 *---------------------------------------*
-Dissectors - Plugins - Display Filters
-       ↓                ↓
+  Dissectors - Plugins - Display Filters
+           ↓                ↓
 *---------------------------------------*
-    Gimp Graphical Toolkit (GTK+)
+      Gimp Graphical Toolkit (GTK+)
 *---------------------------------------*
 *---------------------------------------*
 ```
-### Core Engine
-The Core Engine is the 'glue code that holds the other blocks togather'
+
 ### Wireshark Wiretap Library
-The Wireshark Wiretap Library processes opened traced files for visibility and analysis within the UI for a selected amount of file types.
+
+> The Wireshark Wiretap Library processes opened traced files for visibility and analysis within the UI for a selected amount of file types.
+
+### Core Engine
+
+> The Core Engine is the 'glue code that holds the other blocks togather'
+
 ### Dissectors - Plugins - Display Filters ##
 
-Dissectors AKA decodes... **_Wireshark > Preferences > Protocols_**
+> Dissectors AKA decodes... **_Wireshark > Preferences > Protocols_**
 * Dissectors, plugins and display filters are applied to traffic at this time
     * Dissectors decode packets to display field contents and interpreted values
     * You may edit a dissector such as HTTP when dealing with HTTP traffic on non-default port of TCP80
 
-> **1)** When a packet comes in, Wireshark detects the frame type first and hands the packet off to the correct frame dissector (E.G Ethernet)
-> **2)** After breaking down the contents of the frame header, the dissector looks for an indiciation of what is coming next (E.G, an Ethernet header the value of 0x0800 indicates that the IP is coming up next
-> **3)** The Wireshark Ethernet Dissector hands off the packet to the IP Dissector
-> **4).** The IP Dissector analyzes the IP header and looks to the protocol field in the IP header to identify the next portion > of the packet (E.G the value is 0x06 for TCP, then the IP Dissector hands the packet off to the TCP Dissector)
-> **5)** This same process occurs until no further indications of another possible dissection
+1) When a packet comes in, Wireshark detects the frame type first and hands the packet off to the correct frame dissector (E.G Ethernet)
+2) After breaking down the contents of the frame header, the dissector looks for an indiciation of what is coming next (E.G, an Ethernet header the value of 0x0800 indicates that the IP is coming up next
+3) The Wireshark Ethernet Dissector hands off the packet to the IP Dissector
+4) The IP Dissector analyzes the IP header and looks to the protocol field in the IP header to identify the next portion > of the packet (E.G the value is 0x06 for TCP, then the IP Dissector hands the packet off to the TCP Dissector)
+5) This same process occurs until no further indications of another possible dissection
+
 ### Gimp Graphical Toolkit (GTK+) ##
-* GIMP GTK+ is the graphical toolkit used to create the GUI for Wireshark and offers cross-platform compatibility
+
+> GIMP GTK+ is the graphical toolkit used to create the GUI for Wireshark and offers cross-platform compatibility
+
 ### How a **`TCP Stream`** is created in Wireshark?
+
 ```
 $ tcp.stream eq X
 ```
+
 * Wireshark creates a filter based on the stream number
     * The Stream Index is not an actual field in the TCP header and is defined by Wireshark. This can be use to quickly filter a TCP conversation. 
     * As of Wireshark 1.8, the Stream Index value begins at 0 and increments by 1 for each TCP conversation seen in the trace file.
+
 ### How a **`UDP Stream`** is created in Wireshark?
+
 ```
 $ ((((ipv6.src == 2001:569:5752:600:9915:c408:a195:d51c) && (ipv6.dst == 2001:568:ff09:10c::67))) && (udp.srcport == 49671)) && (udp.dstport == 53)
 ```
-* Wireshark creates a filter based on source/destination IP addresses and source/destination port numbers
+
+* As per the WCNA Chappel University Guide Book == Wireshark creates a filter based on source/destination IP addresses and source/destination port numbers
     * Prior to Wireshark 1.8, UDP conversations were assigned a Stream Index Value and this caused quite some confusion.
+    * **Although**, during my own personal testing with Wireshark version 3.6.7 I noticed a syntax of the following (same as TCP), so I believe the latter is correct:
+
+```
+$ udp.stream eq X
+```
+
 ### How an **`SSL Stream`** is created in Wireshark?
+
 ```
 $ tcp.stream eq X
 ```
@@ -621,6 +706,7 @@ $ tcp.stream eq X
 # `Practical Packet Analysis`
 
 ### `Time Display Formats` and [Time References](https://www.wireshark.org/docs/wsug_html_chunked/ChWorkTimeFormatsSection.html)
+
 * `Absolute` vs `Relative` [time](https://www.quora.com/What-is-the-difference-between-absolute-and-relative-time)
     * Absolute time is cosmic time (I.E 60 million years ago || 12:00pm // specific points of reference)
         * Atomic time uses a bottom up approach, first determining the duration of a second. To do this, it uses atomic decay. Think carbon or plutonium decay. So, 60 seconds makes a minute. 60 minutes makes an hour and 24 hours makes a day.
@@ -628,15 +714,15 @@ $ tcp.stream eq X
         * Relative time is atomic time, while absolute time is cosmic time. For example, the earth rotates on its axis, once per day. That day is divisible by 24 hours. An hour is divisible by 60 minutes and a minute is divisible by 60 seconds. That's cosmic time.
 
 * Packet Timestamps are saved inside PCAP and PCAP-NG files so the packet timestamps can be displayed when the file is opened again
-* The Time Reference setting is **NOT** saved permanently with the trace file
+    * The Time Reference setting is **NOT** saved permanently with the trace file
 * The available Time **presentation formats** are:
 
-* Date and Time of Day: 1970-01-01 01:02:03.123456 The absolute date and time of the day when the packet was captured.
-* Time of Day: 01:02:03.123456 The absolute time of the day when the packet was captured.
-* Seconds Since First Captured Packet: 123.123456 The time relative to the start of the capture file or the first “Time Reference” before this packet
-* Seconds Since Previous Captured Packet: 1.123456 The time relative to the previous captured packet.
-* Seconds Since Previous Displayed Packet: 1.123456 The time relative to the previous displayed packet.
-* Seconds Since Epoch **(1970-01-01): 1234567890.123456 The time relative to epoch (midnight UTC of January 1, 1970)**
+> * Date and Time of Day: 1970-01-01 01:02:03.123456 The absolute date and time of the day when the packet was captured.
+> * Time of Day: 01:02:03.123456 The absolute time of the day when the packet was captured.
+> * Seconds Since First Captured Packet: 123.123456 The time relative to the start of the capture file or the first “Time Reference” before this packet
+> * Seconds Since Previous Captured Packet: 1.123456 The time relative to the previous captured packet.
+> * Seconds Since Previous Displayed Packet: 1.123456 The time relative to the previous displayed packet.
+> * Seconds Since Epoch **(1970-01-01): 1234567890.123456 The time relative to epoch (midnight UTC of January 1, 1970)**
 
 | Time Syntax | Description |
 | ------ | ------ |
@@ -644,14 +730,17 @@ $ tcp.stream eq X
 | `frame.time_delta` | is the Time Delta from Previous Captured Frame when a packet arrived, compared to the previous captured packet regardless of files.
 | `frame.time_delta` | (Time Delta from Previous Displayed Frame) is NOT the same and must be filtered with a conversation first, then apply a filter.
 | `frame.time_relative}` (Time Reference, Since Reference or First Packet) | Compares the current packet time to the first packet in the trace file `frame.time_relative==0` or the most recent packet that has the time reference set
+
 * You can filter on TCP Conversation timestamps for detecting latency which requires no filtering.
     * **_Edit > Preferences > Protocols > TCP > Calculate Conversation Timestamps_**
 
 
-[Serial Communication](https://learn.sparkfun.com/tutorials/serial-communication/all)
+* [`Serial Communication`](https://learn.sparkfun.com/tutorials/serial-communication/all)
 > `Parallel vs. Serial`
 > * **Parallel interfaces** transfer multiple bits at the same time. They usually require buses of data - transmitting across eight, sixteen, or more wires. Data is transferred in huge, crashing waves of 1`s and 0`s.
 > * **Serial interfaces** stream their data, one single bit at a time. These interfaces can operate on as little as one wire, usually never more than four.
+
+* `Networking Encapsulation and De-Capsulation Models`
 
 | OSI (Open Systems Interconnect) Model (7 Layers) | Mnemonic
 | ------ | ------ |
@@ -678,22 +767,27 @@ $ tcp.stream eq X
 | `TCP` = | `ip.proto==6` `(0x06)`
 | `UDP` = | `ip.proto==17` `(0x11)`
 
-> * Each fragment of a fragmented IP packet does **_NOT_** have a different ID (identification value), and is the same
+> * Note: Each fragment of a fragmented IP packet does **_NOT_** have a different ID (identification value), and is the same
+
 ```
  ip.flags.mf ==1 or ip.frag_offset gt 0
 ```
+
 * **IGMP** (Internet Group Management Protocol) is a communicated used by a host to dynamically join a Multicast (IPv4 Destination = `224.0. 0.0 through 239.255. 255.255` and 01-00-5E in hexadecimal for MAC Address) group.
 * The TTL (IP-layer) used within a Traceroute can be any set value from 1-255 and is deprecated (AKA subtracted) by a value of 1 (one) at a router or layer three boundary until the integer value reaches 0 and thus the packet has to be discarded which prevents looping layer three packets.
 * ARP is a layer 2 protocol. The Address Resolution Protocol is a layer 2 protocol used to map MAC addresses to IP addresses.
-> Beware of Proxy-ARP, ARP packets are not forwarded over L3 boundaries as they do not contain an IP header
-> Proxy ARP is a technique by which a proxy server on a given network answers the Address Resolution Protocol (ARP) queries for an IP address that is not on that network.
-> **Opcode field** in the `Address Resolution Protocol` (ARP) Message specifies the nature of the ARP message. 
-* `1 for ARP request` (destined to IPv4 broadcast FF:FF:FF:FF:FF:FF:FF:FF and `2 for ARP reply`.
+> * Beware of Proxy-ARP, ARP packets are not forwarded over L3 boundaries as they do not contain an IP header
+> * Proxy ARP is a technique by which a proxy server on a given network answers the Address Resolution Protocol (ARP) queries for an IP address that is not on that network.
+
+> * **Opcode field** in the `Address Resolution Protocol` (ARP) Message specifies the nature of the ARP message. 
+>     * `1 for ARP request` (destined to IPv4 broadcast FF:FF:FF:FF:FF:FF:FF:FF and `2 for ARP reply`.
 
 ### `IPv4` (Internet Protocol v4)
-> 32-bit addressing scheme, represented in decimal notation
-> Display Filter = "`{$ ip}`"
-> IPv4 Header Length == 20-60 bytes
+
+> * 32-bit addressing scheme, represented in decimal notation
+> * Display Filter = "`{$ ip}`"
+> * IPv4 Header Length == 20-60 bytes
+
 * In IPv4, the Identification (ID) field is a 16-bit value that is unique for every datagram for a given source address, destination address, and protocol, such that it does not repeat within the maximum datagram lifetime (MDL).
 * As currently specified, all datagrams between a source and destination of a given protocol must have unique IPv4 ID values over a period of this MDL, which is typically interpreted as two minutes and is related to the recommended reassembly timeout.
 
@@ -703,7 +797,9 @@ $ tcp.stream eq X
 > * Capture Filter = "`{$ ip6}`"
 > * IPv6 Header length == 40 bytes
 > * IPv6 does not use TTL (time-to-live), but uses "Hop Limit"
+
 ### `EtherTypes`
+
 > * EtherType is a two-octet field in an Ethernet frame. 
 > * It is used to indicate which protocol is encapsulated in the payload of an Ethernet Frame
 > * EtherType numbering generally starts from 0x0800.
@@ -727,20 +823,23 @@ $ tcp.stream eq X
 | 0x88CC  | Link Layer Discovery Protocol (LLDP)
 
 ### `TCP` - Transmission Control Protocol
-1) **0-65535 bytes/OxFFFF** maximum payload/TCP Window field which is a two byte field
-2) _Connection-orientated_ protocol
+
+1) **0-65535 bytes (OxFFFF) {{in which TCP Window Scaling is negotiated between two endpoints}}** .. Maximum payload/TCP Window field which is a two byte field
+2) _Connection-orientated_ protocol, established with a three-way handshake
 2) **Flow Control** using Sequence `SEQ` and Acknowledgement `ACK` numbers to ensure data arrives at the destination and offers automatic retransmission for lost segments and flow control mechanisms to avoid saturation of a network or TCP host. 
 Three identical ACK's trigger a TCP Re-Transmission
-3) Error **Checksum Recovery** and Validation (performed on the contents of the TCP header and data) as well as a psuedo header derived from the IP header.
+3) Error **Checksum Recovery** and Validation (performed on the contents of the TCP header and data)
+    * As well as a psuedo header derived from the IP header.
 4) TCP Header Size commonly == 20 bytes and variable-length data with supported TCP Options fields which can extend the header length `$ tcp.hdr_len > 20}`
 5) **MSS** (Maximum Segment Size) is the agreed lowest value during the initial two packets of the TCP Three Way Handshake and defines what segment size the host and server will support. `$ tcp.options.mss_val < 1460`
 6) TCP Timestamp column in Wireshark `tcp.time_delta}` is the time since previous frame in the TCP Stream and useful for troubleshooting TCP communications and conversations to see large gaps in time and potential packet loss and|or latency.
 
-> Capture Filter Syntax == "`tcp`"
-> Display Filter Syntax == "`tcp`"
+> * Capture Filter Syntax == "`tcp`"
+> * Display Filter Syntax == "`tcp`"
 
-> The Congestion Window == "**cwnd**"
-> The Receive Window == "**rwin**" == The TCP buffer space on the receiving end of a TCP connection and maximum size is dependent on the settings and capabilities of the receiver. The current receive buffer size is based on the amount of available space to accept more data from a peer before handing the data up to an application.
+> * The Congestion Window == "**cwnd**"
+> * The Receive Window == "**rwin**" == The TCP buffer space on the receiving end of a TCP connection and maximum size is dependent on the settings and capabilities of the receiver. 
+>     * The current receive buffer size is based on the amount of available space to accept more data from a peer before handing the data up to an application.
 
 ```
 $ !(tcp.flags.cwr==0) || !(tcp.flags.ecn==0)
@@ -748,6 +847,7 @@ $ tcp.options.wscale_val
 ```
 
 ## `TCP Sequence and Acknowledgement Process`
+
 * Each TCP device assigns its own ISN (Initial Sequence Number) which is a randomly unique generated integer.
     * The Next Expected Sequence Number appears on packets that contain data and is not seen in SYN packets or simple ACK packets. 
     * Wireshark examines the current packet Sequence Number and adds the number of data bytes to provide this number.
@@ -757,12 +857,13 @@ Sequence Number In
 ----------------------------
 = Acknowledgement Number Out
 ```
-> **1)** * The ACK number field indicates the next expected sequence number from the other side of the communication.
-> **2)** An ACK number field that is never incremented by a host simply indicates that no data is being received by that host.
-> **3)** Remember, the Acknowledgement Number field contains the value of the next sequence number expected from the other side which only increments when data is received.
-> **4)** The initial SYN, SYN/ACK, ACK TCP Three-way handshake does not contain numbers in the SEQ's/ACK's as there is no payload here, but increments by 1 even though a byte of data was not sent.
-> **5)** After the handshake is established, the sequence numbers only increment by the number of actual data bytes sent.
-> **6)** The Sequence number increments by the number of data bytes contained in each packet by the sender.
+
+1) The ACK number field indicates the next expected sequence number from the other side of the communication.
+2) An ACK number field that is never incremented by a host simply indicates that no data is being received by that host.
+3) Remember, the Acknowledgement Number field contains the value of the next sequence number expected from the other side which only increments when data is received.
+4) The initial SYN, SYN/ACK, ACK TCP Three-way handshake does not contain numbers in the SEQ's/ACK's as there is no payload here, but increments by 1 even though a byte of data was not sent.
+5) After the handshake is established, the sequence numbers only increment by the number of actual data bytes sent.
+6) The Sequence number increments by the number of data bytes contained in each packet by the sender.
 
 Display Filters for TCP Flags:
 ```
@@ -782,8 +883,10 @@ $ tcp.flags==0x12
 ### `TCP Sequence and Acknowledgement Process - Analysis:`
 
 > * The ACK number field indicates the next sequence number expected from the other side of the connection.
-* To test the TCP Sequence and Acknowledgement Process into Markdown format & for my own analysis, I conducted the following test...
+> * A host that increases the TCP ACK number field value in outbound TCP packets is receiving data from a TCP peer.
+> * TCP peers increment their sequence numbers by 1 during the handshake process even though no data is contained in the SYN or SYN/ACK packets.
 
+* To test the TCP Sequence and Acknowledgement Process into Markdown format & for my own analysis, I conducted the following test...
 
 1) Verify the IP address of a HTTP-based (non-TLS) website for the capture
 2) Run a cURL using IPv4 and TCP (default) to simplify a HTTP GET request to exchange data after a TCP three-way handshake
@@ -794,6 +897,7 @@ ping neverssl.com
 PING neverssl.com (34.223.124.45): 56 data bytes
 adamdawson@SL-1788 ~ % curl --GET neverssl.com -4
 ```
+
 * Display Filter: (Wireshark GUI)
 ```
 tcp.stream eq 4
@@ -834,10 +938,23 @@ adamdawson@SL-XXXX ~ % tshark -r ~/Downloads/ads-tcp-http_curl-three-way-handsha
 > * TCP Retransmission is just a packet that doesn't acknowledge within the timeout.
 > * TCP Fast Retransmission is when the source gets confirmation that the packet wasn't received
 > * Wireshark uses the term "Fast Retransmission" to define TCP retransmission that occur within 20ms of a Duplicate ACK
-> Simply put:
-> * TCP Retransmission is mostly dependent on the packet's timeout to detect a miss (Mostly 3 duplicate acknowledgment  `{{DUP ACK}}` for a packet is deduced as a packet miss)
-> * In TCP Fast Retransmission, duplicate acknowledgement for a particular packet symbolizes it's miss.
-> * The advantage of TCP Fast Retransmission is that it doesn't wait for the packet timeout to initiate a transmission and hence a faster retransmission of packet, as the name also suggests.
+> Simply put...
+
+* TCP Retransmission is mostly dependent on the packet's timeout to detect a miss 
+    * (Mostly 3 duplicate acknowledgment  `{{DUP ACK}}` for a packet is deduced as a packet miss)
+* In TCP Fast Retransmission, duplicate acknowledgement for a particular packet symbolizes it's miss.
+    * The advantage of TCP Fast Retransmission is that it doesn't wait for the packet timeout to initiate a transmission and hence a faster retransmission of packet, as the name also suggests.
+* Wireshark detects TCP Re-Transmissions using the Sequence and Acknowledgement Numbers from the TCP headers
+
+> * `DUP ACK's` are part of a failure recovery mechanism called "TCP Fast retransmit", ensuring the reliability of TCP protocol. 
+> * A duplicate acknowledgment is sent when a receiver receives out-of-order packets (let say sequence 2-4-3). 
+>     * Upon receiving packet #4 the receiver starts sending duplicate acks so the sender would start the fast-retransmit process. Another situation is packet loss.
+
+* Detect DUP ACK's with the following Display Filter:
+
+```
+$ tcp.analysis.duplicate_ack
+```
 
 * The TCP window size field controls the flow of data and is limited to 2 bytes, or a window size of 65,535 bytes.
 
@@ -852,15 +969,22 @@ adamdawson@SL-XXXX ~ % tshark -r ~/Downloads/ads-tcp-http_curl-three-way-handsha
 | URG | 0x32 |
 
 ### `UDP` - User Datagram Protocol
-> **1)** 0-65535 bytes maximum payload
-> **2)** Connectionless protocol
-> **3)** No error validation
-> **4)** UDP Header Size == 8 bytes and variable-length data
 
-> Capture Filter Syntax == "`udp`"
-> Display Filter Syntax == "`udp`"
+1) 0-65535 bytes maximum payload
+2) Connectionless protocol
+3) No error validation
+4) UDP Header Size (**Fixed/Static-length**) == 8 bytes and variable-length data
+
+> * Capture Filter Syntax == "`udp`"
+> * Display Filter Syntax == "`udp`"
 
 * UDP is a Transport Layer protocol used for Multicast traffic
+
+* Both DHCP and DNS conversations include a Transaction ID which is not created from Wireshark intervention
+> * The DNS Transaction ID (transaction identifier) is a 16-bits random value chosen by the client. 
+>     * When a client sends a question to a DNS server, it remembers the question and its identifier. 
+>     * When a server returns an answer, it returns in the Transaction ID field the identifier chosen by the client.
+> * The DHCP Transaction ID is the same as the DHCP discover (DHCP being a layer 7 protocol)
 
 ### `ICMP` - Internet Control Message Protocol
 * Example ICMP Types:
@@ -880,7 +1004,7 @@ adamdawson@SL-XXXX ~ % tshark -r ~/Downloads/ads-tcp-http_curl-three-way-handsha
 
 * ICMP is treats as a L3 protocol. Linux default protocol for traceroute is UDP. An ICMP packet such as ICMP Echo Reply contains portions of the original packet which triggered the initial ICMP response.
 
-* Example ICMP Codes
+* **Example ICMP Codes**
     * Many ICMP packet types have several possible Code field values
 
 | ICMP Codes | Request
@@ -896,6 +1020,7 @@ adamdawson@SL-XXXX ~ % tshark -r ~/Downloads/ads-tcp-http_curl-three-way-handsha
 | Code 12 | Destination Network Unreachable for ToS (Type of Service)
 
 ### `FTP` (TCP21) `ACTIVE` vs `PASSIVE` mode
+
 * FTP is a non-secure protocol and username/password are passed in clear text
     * In *`Passive`* Mode, the FTP server waits for the FTP client to send it a port and IP address to connect to. The client initiates the connection. In *`Passive`* Mode, the *`PASV`* command to establish a Passive Mode FTP Connection.
     * In *`Active`* mode, the Server connects to the FTP client to establish the Data channel IP address/dport. Within *Active* mode, the FTP *`PORT`* command is used to establish an Active Mode FTP Connection.
@@ -906,35 +1031,49 @@ $ ftp.request.arg==""
 ```
 
 * FTP Capture Filter == 
-> "`$ tcp port 21`" (Communication/Command Channel) / "`$ tcp port <dport>`" (Data Channel)
+
+> * "`$ tcp port 21`" (Communication/Command Channel)
+> * "`$ tcp port <dport>`" (Data Channel - Dynamic)
+
 * FTP Display Filter == 
-> "`$ ftp`" (Communication/Command Channel) / "`$ ftp-data`" (Data Channel)
+
+> * "`$ ftp || tcp.srcport == 21 && tcp.dport == <dport>`" (Communication/Command Channel)
+> * "`$ ftp-data` || tcp.srcport == 21 && tcp.dport == <dport>`" (Data Channel - Dynamic)
 
 * FTP processes and maintains two parallel TCP connections whilst transferring files (The Communication Channel & The Data Channel)
 
-### `DHCP` Traffic (UDP Broadcasts of Variable Length for IPv4 and Multicast for IPv6) - 
+### `DHCP` (Layer 7 Protocol) Traffic (UDP Broadcasts of Variable Length for IPv4 and Multicast for IPv6) - 
 ### `DHCP IPv4 DORA` is the default startup sequence for a DHCP Client
 * As DHCP traffic is Broadcast traffic, it does not cross intra-VLAN boundaries by default
 * DHCP Helper (DHCP Relay Agent) is used when the router acts a proxy to forward DHCP traffic via external VLANs
 * DHCP requests are tracked using a unique Transaction ID
 * DHCPv4 is based on BOOTP and you will not see BOOTP reference in any DHCPv6 packets
 
-> `UDP 67`=Server Daemon (IPv4)
-> `UDP 68`Client Process (IPv4)
-> `UDP 546`Client Process (IPv6)
-> `UDP 547`Server Daemon (IPv6)
+> * `UDP 67`=Server Daemon (IPv4)
+> * `UDP 68`Client Process (IPv4)
+> * `UDP 546`Client Process (IPv6)
+> * `UDP 547`Server Daemon (IPv6)
 
 * Capture Filter for IPv4 == 
-> $ port 67 or port 68 .. (Even though the client port, traffic will always flow to or from port 67)
+
+> $ port 67 or port 68
+* Even though the client port, traffic will always flow to or from port 67
+
 * Capture Filter for IPv6 == 
-> $ port 546 or port 547..(Even though the client port, traffic will always flow to or from port 546)
+
+> $ port 546 or port 547
+* Even though the client port, traffic will always flow to or from port 546)
+
 * Display Filter for IPv4 == 
+
 > $ dhcp .. or $ bootp 
+
 * Display Filter for IPv6 == 
+
 > $ dhcpv6
 
 `DHCP DORA`
-* `D=Discover` (0.0.0.0/0 -> 255.255.255.255:68)
+* `D=Discover` (IPv4 Broadcast <src-mac>0.0.0.0/0:67 -> <FF:FF:FF:FF:FF:FF:FF:FF>/255.255.255.255:68)
 * `O=Offer`
 * `R=Request`
 * `A=Acknowledge`
@@ -945,23 +1084,33 @@ $ ftp.request.arg==""
 * T1 Renewal Time == `{.50 * LT}`
 * T2 Rebind Time == `{.875 * LT}`
 
-> * DHCP DORA includes a Transaction ID to track (this is not a Wireshark added field)
+> * **DHCP DORA includes a Transaction ID to track (this is not a Wireshark added field)**
 
 ### `SIP` (Session Initiation Protocol)
 
-* TCP5060 (dport) is most common for SIP communication channels and contains the URI (Uniform Resource Indicator - I.E, where to identify the SIP user's IP registration / response address)
-* `RTP` (Real Time Protocol) is used to carry data through the data flow channel and contains the audio, dport is not fixed and uses UDP
-* `SDP` is an Application-layer protocol
+* TCP5060 (dport) is most common for SIP communication channels and contains the URI (Uniform Resource Indicator - I.E, where to identify the SIP callers IP addressing information / response address)
+    * SIP exists in-between the Transport (layer 4) and Session (layer 5) layer of the OSI model 
+* `RTP` (Real Time Protocol) is used to carry data through the data flow channel and contains the audio, dport is not fixed and uses **UDP**
+* `SDP` is listed as an Application-layer protocol in practice exams
+    * [SDP](https://info.teledynamics.com/blog/know-your-protocols-voip-protocols-that-work-together-with-sip) does not carry the media itself, nor is it sent via any Transport Layer protocol. Rather, it is included as a payload of the SIP messages themselves.
+    * Therefore, SDP exists in-between the Transport (layer 4) and Session (layer 5) layer of the OSI model
+* `RTCP` (Real Time Control Protocol) is the sister protocol of RTP. 
+    * RTCP collects out-of-band statistics and control information for RTP sessions. Out-of-band just means that the exchange of this information occurs in a separate, parallel session rather than within the RTP media stream. 
+    * The purpose of RTCP is to provide feedback on the Quality of Service (QoS), including statistics such as packet counts, packet loss, jitter, and round-trip delay time. 
+        * This information is shared between endpoints, which can react to these changes by limiting packet flows or by changing to another available codec.
 * Wireshark _*cannot_* playback encrypted VoIP conversations
+* Wireshark VOIP decoder cannot decode Skype traffic as it uses a proprietary protocol for communications, I.E not SIP
 
 | SIP Codes | Request
 | ------ | ------ |
-| `1xx`— | Provisional Responses (E.G, "180 RINGING")
-| `2xx`— | Successful Responses
-| `3xx`— | Redirection Responses
-| `4xx`— | Client Failure Responses
-| `5xx`— | Server Failure Responses
-| `6xx`— | Global Failure Responses
+| `1xx` | Provisional Responses (E.G, "180 RINGING")
+| `2xx` | Successful Responses
+| `3xx` | Redirection Responses
+| `4xx` | Client Failure Responses
+| `5xx`—| Server Failure Responses
+| `6xx` | Global Failure Responses
+
+* To filter for SIP Methods, example an invite which should trigger a 180 ringing response
 
 ```
 sip.Method==INVITE
@@ -973,11 +1122,11 @@ sip.Method==INVITE
 
 ### Common `HTTP` Response and Status Codes
 
-> `Informational` responses *`(100–199)`*
-> `Successful` responses *`(200–299)`*
-> `Redirection` messages *`(300–399)`*
-> `Client error responses` *`(400–499)`*
-> `Server error responses` *`(500–599)`*
+> * `Informational` responses *`(100–199)`*
+> * `Successful` responses *`(200–299)`*
+> * `Redirection` messages *`(300–399)`*
+> * `Client error responses` *`(400–499)`*
+> * `Server error responses` *`(500–599)`*
 
 | `HTTP Status` Code | Meaning
 | ------ | ------ |
@@ -1023,6 +1172,7 @@ sip.Method==INVITE
     * The RTT (Round Trip Time) Graph tracks the time between data being transmitted and the associated TCP ACK.
 * `Throughput Graphs` 
     * Throughput graphs are unidirectional and plot the total amount of bytes seen in the trace.
+    > * TCP Throughput graphs are not bi-directional
 * `TCP Time-Sequence}`
     * TCP Time-Sequence Graphs are unidirectional and plot the individual TCP packets based on the TCP sequence number changes over time. In addition, this graph type depics the ACKs seen and the window size. In a smooth data transfer process, the "I bar line" goes from the lower left corner to the upper right corner along a smooth path.
 > Likely causes of empty graphs is that you have selected a packet travelling in the wrong trafic direction before building a graph which is unidirectional-based.
@@ -1032,7 +1182,9 @@ sip.Method==INVITE
 > This mode will limit the maximum disk usage, even for an unlimited amount of capture input data, only keeping the latest captured data.
 
 * Wireshark IO Graphs support **"Copying to CSV Format"**
-`Wireshark Advanced IO Graph {Calc} Functions`
+
+### `Wireshark Advanced IO Graph {Calc} Functions`
+
 | Function | Description
 | ------ | ------ |
 | `SUM(*)` | Adds up and plots the value of a field for all instances in the tick interval
@@ -1042,14 +1194,19 @@ sip.Method==INVITE
 | `COUNT(*)` | Counts the number of occurrences of the field seen during a tick interval **(Best for graphing the frequency of tcp.analysis.retransmission packets)**
 | `LOAD(*)` | Used for response time graphs
 
-### `{Wireshark Command Line Tools}`
+### `Wireshark Command Line Tools`
 
 * `Tshark`'s primary purpose is to offer command line packet capture and preferred over Wireshark GUI as it uses fewer resources. It can also be used with the **-z** parameter to gather information about protocol and application statistics.
-* `tcpdump` uses fewer system resources than Tshark but does not offer as many capture configuration options
-* `Capinfos.exe` Prints information about trace files (display capture duration, end/start times, average data rate in bytes, average packet size etc.) Capinfos.exe will not display information about protocol and application statistics
-* `Editcap` Can be used to edit a trace filter such as split the filter, merge traces, alter trace file timestamp, remove duplicates etc... Useful for amending timestamp of two traces to a common timestamp, then merging for easier analysis and comparing contents in their IO graphs
-* `Text2pcap` Generates a trace file from an ASCII hex dump of packets ... `{$ text2pcap plain.txt plain.pcapng}` .. Prepends dummy headers if not in the plain-text hex file
-* `Dumpcap` Captures network packets and saves them into a libpcap format and is the capture engine for Tshark, uses fewer resources than Tshark.
-* `Rawshark` expects raw libpcap packet headers, followed by packet data and makes no assumptions about the encapsulation or input format (like Tshark)
+* `tcpdump` - uses fewer system resources than Tshark but does not offer as many capture configuration options
+* `Capinfos.exe` - Prints information about trace files (display capture duration, end/start times, average data rate in bytes, average packet size etc.) Capinfos.exe will not display information about protocol and application statistics
+
+```
+$ capinfos [options] <infile> ..
+```
+
+* `Editcap` - Can be used to edit a trace filter such as split the filter, merge traces, alter trace file timestamp, remove duplicates etc... Useful for amending timestamp of two traces to a common timestamp, then merging for easier analysis and comparing contents in their IO graphs
+* `Text2pcap` - Generates a trace file from an ASCII hex dump of packets ... `{$ text2pcap plain.txt plain.pcapng}` .. Prepends dummy headers if not in the plain-text hex file
+* `Dumpcap` - Captures network packets and saves them into a libpcap format and is the capture engine for Tshark, uses fewer resources than Tshark.
+* `Rawshark` - expects raw libpcap packet headers, followed by packet data and makes no assumptions about the encapsulation or input format (like Tshark)
 
 ### `EOF`
