@@ -23,6 +23,8 @@ $ cp -R ./*.zip /Users/GangGreenTemperTatum/.config/wireshark/profiles/
 
 OR:
 
-`for i in `ls`; do unzip -d ./; done;`
+```
+for i in `ls`; do unzip -d ./; done;
+```
 
 3) Gracefully restart Wireshark, voila!
