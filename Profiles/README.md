@@ -20,4 +20,9 @@ $ cp -R ./ /Users/GangGreenTemperTatum/.config/wireshark/profiles/
 $ cp -R ./*.zip /Users/GangGreenTemperTatum/.config/wireshark/profiles/
 ```
 2) Automate the uncompressing of zipped folders and their contents to their own unique directory [shell script (`enumerate_zipped_directories_to_unzipped_format.sh`) here](https://github.com/GangGreenTemperTatum/bash/blob/main/enumerate_zipped_directories_to_unzipped_format.sh)
+
+OR:
+
+`for i in `ls`; do unzip -d ./; done;`
+
 3) Gracefully restart Wireshark, voila!
